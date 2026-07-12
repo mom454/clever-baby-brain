@@ -5,8 +5,6 @@ export const Route = createFileRoute("/api/stt")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const auth = request.headers.get("authorization");
-        if (!auth?.startsWith("Bearer ")) return new Response("Unauthorized", { status: 401 });
         const inbound = await request.formData();
         const file = inbound.get("file");
         if (!(file instanceof File)) return new Response("Missing file", { status: 400 });
