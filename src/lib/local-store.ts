@@ -21,7 +21,7 @@ const K = {
   mems: "baby.memories.v1",
 };
 
-const STORE_EVENT = "baby-store-change";
+
 
 function read<T>(key: string, fallback: T): T {
   if (typeof localStorage === "undefined") return fallback;
@@ -33,19 +33,33 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
+// Cached snapshots so useSyncExternalStore sees stable references between changes.
+let threadsSnapshot: Thread[] | null = null;
+const msgsSnapshot = new Map<string, Msg[]>();
+let memoriesSnapshot: Memory[] | null = null;
+const listeners = new Set<() => void>();
+
+function invalidate(key: string) {
+  if (key === "*" || key === K.threads) threadsSnapshot = null;
+  if (key === "*" || key === K.mems) memoriesSnapshot = null;
+  if (key === "*") msgsSnapshot.clear();
+  else if (key.startsWith("baby.msgs.v1.")) msgsSnapshot.delete(key.slice("baby.msgs.v1.".length));
+  listeners.forEach((l) => l());
+}
+
 function write(key: string, value: unknown) {
   if (typeof localStorage === "undefined") return;
   localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new CustomEvent(STORE_EVENT, { detail: { key } }));
+  invalidate(key);
 }
 
 export function subscribeStore(cb: () => void) {
-  const handler = () => cb();
-  window.addEventListener(STORE_EVENT, handler);
-  window.addEventListener("storage", handler);
+  listeners.add(cb);
+  const onStorage = (e: StorageEvent) => invalidate(e.key ?? "*");
+  window.addEventListener("storage", onStorage);
   return () => {
-    window.removeEventListener(STORE_EVENT, handler);
-    window.removeEventListener("storage", handler);
+    listeners.delete(cb);
+    window.removeEventListener("storage", onStorage);
   };
 }
 
@@ -58,7 +72,12 @@ function id() {
 export const store = {
   // Threads
   getThreads(): Thread[] {
-    return read<Thread[]>(K.threads, []).slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    if (!threadsSnapshot) {
+      threadsSnapshot = read<Thread[]>(K.threads, [])
+        .slice()
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+    return threadsSnapshot;
   },
   getThread(threadId: string): Thread | null {
     return store.getThreads().find((t) => t.id === threadId) ?? null;
@@ -84,7 +103,12 @@ export const store = {
 
   // Messages
   getMessages(threadId: string): Msg[] {
-    return read<Msg[]>(K.msgs(threadId), []);
+    let cached = msgsSnapshot.get(threadId);
+    if (!cached) {
+      cached = read<Msg[]>(K.msgs(threadId), []);
+      msgsSnapshot.set(threadId, cached);
+    }
+    return cached;
   },
   addMessage(m: Omit<Msg, "id" | "createdAt">): Msg {
     const msg: Msg = { ...m, id: id(), createdAt: Date.now() };
@@ -101,7 +125,12 @@ export const store = {
 
   // Memories
   getMemories(): Memory[] {
-    return read<Memory[]>(K.mems, []).slice().sort((a, b) => b.createdAt - a.createdAt);
+    if (!memoriesSnapshot) {
+      memoriesSnapshot = read<Memory[]>(K.mems, [])
+        .slice()
+        .sort((a, b) => b.createdAt - a.createdAt);
+    }
+    return memoriesSnapshot;
   },
   addMemory(content: string): Memory {
     const m: Memory = { id: id(), content, createdAt: Date.now() };
@@ -116,7 +145,7 @@ export const store = {
     for (const t of read<Thread[]>(K.threads, [])) localStorage.removeItem(K.msgs(t.id));
     localStorage.removeItem(K.threads);
     localStorage.removeItem(K.mems);
-    window.dispatchEvent(new CustomEvent(STORE_EVENT, { detail: { key: "*" } }));
+    invalidate("*");
   },
 };
 
