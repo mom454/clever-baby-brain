@@ -145,7 +145,7 @@ export const store = {
     for (const t of read<Thread[]>(K.threads, [])) localStorage.removeItem(K.msgs(t.id));
     localStorage.removeItem(K.threads);
     localStorage.removeItem(K.mems);
-    window.dispatchEvent(new CustomEvent(STORE_EVENT, { detail: { key: "*" } }));
+    invalidate("*");
   },
 };
 
