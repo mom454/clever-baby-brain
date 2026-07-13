@@ -21,7 +21,7 @@ const K = {
   mems: "baby.memories.v1",
 };
 
-const STORE_EVENT = "baby-store-change";
+
 
 function read<T>(key: string, fallback: T): T {
   if (typeof localStorage === "undefined") return fallback;
