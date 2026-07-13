@@ -103,7 +103,12 @@ export const store = {
 
   // Messages
   getMessages(threadId: string): Msg[] {
-    return read<Msg[]>(K.msgs(threadId), []);
+    let cached = msgsSnapshot.get(threadId);
+    if (!cached) {
+      cached = read<Msg[]>(K.msgs(threadId), []);
+      msgsSnapshot.set(threadId, cached);
+    }
+    return cached;
   },
   addMessage(m: Omit<Msg, "id" | "createdAt">): Msg {
     const msg: Msg = { ...m, id: id(), createdAt: Date.now() };
