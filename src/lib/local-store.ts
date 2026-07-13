@@ -72,7 +72,12 @@ function id() {
 export const store = {
   // Threads
   getThreads(): Thread[] {
-    return read<Thread[]>(K.threads, []).slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    if (!threadsSnapshot) {
+      threadsSnapshot = read<Thread[]>(K.threads, [])
+        .slice()
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+    return threadsSnapshot;
   },
   getThread(threadId: string): Thread | null {
     return store.getThreads().find((t) => t.id === threadId) ?? null;
