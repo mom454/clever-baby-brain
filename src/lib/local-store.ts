@@ -33,19 +33,33 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
+// Cached snapshots so useSyncExternalStore sees stable references between changes.
+let threadsSnapshot: Thread[] | null = null;
+const msgsSnapshot = new Map<string, Msg[]>();
+let memoriesSnapshot: Memory[] | null = null;
+const listeners = new Set<() => void>();
+
+function invalidate(key: string) {
+  if (key === "*" || key === K.threads) threadsSnapshot = null;
+  if (key === "*" || key === K.mems) memoriesSnapshot = null;
+  if (key === "*") msgsSnapshot.clear();
+  else if (key.startsWith("baby.msgs.v1.")) msgsSnapshot.delete(key.slice("baby.msgs.v1.".length));
+  listeners.forEach((l) => l());
+}
+
 function write(key: string, value: unknown) {
   if (typeof localStorage === "undefined") return;
   localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new CustomEvent(STORE_EVENT, { detail: { key } }));
+  invalidate(key);
 }
 
 export function subscribeStore(cb: () => void) {
-  const handler = () => cb();
-  window.addEventListener(STORE_EVENT, handler);
-  window.addEventListener("storage", handler);
+  listeners.add(cb);
+  const onStorage = (e: StorageEvent) => invalidate(e.key ?? "*");
+  window.addEventListener("storage", onStorage);
   return () => {
-    window.removeEventListener(STORE_EVENT, handler);
-    window.removeEventListener("storage", handler);
+    listeners.delete(cb);
+    window.removeEventListener("storage", onStorage);
   };
 }
 
