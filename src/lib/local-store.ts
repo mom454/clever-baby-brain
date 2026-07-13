@@ -125,7 +125,12 @@ export const store = {
 
   // Memories
   getMemories(): Memory[] {
-    return read<Memory[]>(K.mems, []).slice().sort((a, b) => b.createdAt - a.createdAt);
+    if (!memoriesSnapshot) {
+      memoriesSnapshot = read<Memory[]>(K.mems, [])
+        .slice()
+        .sort((a, b) => b.createdAt - a.createdAt);
+    }
+    return memoriesSnapshot;
   },
   addMemory(content: string): Memory {
     const m: Memory = { id: id(), content, createdAt: Date.now() };
