@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Plus, MessageSquare, BrainCircuit, Trash2, Sparkles, Sun, Moon, Menu } from "lucide-react";
+import { Plus, MessageSquare, BrainCircuit, Trash2, Sparkles, Sun, Moon, Menu, Settings as SettingsIcon, Mic, Command as CommandIcon } from "lucide-react";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
@@ -130,10 +130,25 @@ function Sidebar({
 
         <div className="border-t border-sidebar-border p-2">
           <Link
+            to="/voice"
+            onClick={onCloseMobile}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
+          >
+            <Mic size={16} className="opacity-70" /> Voice mode
+          </Link>
+          <Link
             to="/memories"
+            onClick={onCloseMobile}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
           >
             <BrainCircuit size={16} className="opacity-70" /> Memories
+          </Link>
+          <Link
+            to="/settings"
+            onClick={onCloseMobile}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
+          >
+            <SettingsIcon size={16} className="opacity-70" /> Settings
           </Link>
           <button
             onClick={toggle}
@@ -145,6 +160,17 @@ function Sidebar({
               <Moon size={16} className="opacity-70" />
             )}
             {theme === "dark" ? "Light theme" : "Dark theme"}
+          </button>
+          <button
+            onClick={() =>
+              window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))
+            }
+            className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
+          >
+            <span className="flex items-center gap-2">
+              <CommandIcon size={16} className="opacity-70" /> Command palette
+            </span>
+            <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">⌘K</kbd>
           </button>
           <div className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground">
             <Sparkles size={12} className="text-primary" />
