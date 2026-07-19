@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { gatewayFetch } from "@/lib/ai-gateway.server";
+import { requireAuthAndRateLimit } from "@/lib/api-guard.server";
 
 export const Route = createFileRoute("/api/stt")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const guard = await requireAuthAndRateLimit(request);
+        if (!guard.ok) return guard.response;
+
         const inbound = await request.formData();
         const file = inbound.get("file");
         if (!(file instanceof File)) return new Response("Missing file", { status: 400 });

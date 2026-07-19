@@ -108,7 +108,7 @@ function VoicePage() {
       const ext = rec?.mimeType.includes("mp4") ? "mp4" : "webm";
       const fd = new FormData();
       fd.append("file", blob, `recording.${ext}`);
-      const sttR = await fetch("/api/stt", { method: "POST", body: fd });
+      const sttR = await (await import("@/lib/authed-fetch")).authedFetch("/api/stt", { method: "POST", body: fd });
       if (!sttR.ok) throw new Error(await sttR.text());
       const { text } = (await sttR.json()) as { text: string };
       const userText = text.trim();
@@ -125,7 +125,7 @@ function VoicePage() {
       const history = nextTurns.map((t) => ({ role: t.role, content: t.text }));
       const memories = store.getMemories().map((m) => m.content);
 
-      const r = await fetch("/api/chat", {
+      const r = await (await import("@/lib/authed-fetch")).authedFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,7 +161,7 @@ function VoicePage() {
     if (!text) return;
     setState("speaking");
     try {
-      const r = await fetch("/api/tts", {
+      const r = await (await import("@/lib/authed-fetch")).authedFetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, voice: s.voice }),

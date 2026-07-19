@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { gatewayFetch } from "@/lib/ai-gateway.server";
+import { requireAuthAndRateLimit } from "@/lib/api-guard.server";
 
 // Gemini image generation via chat-completions shape. Returns { image: dataUrl }.
 export const Route = createFileRoute("/api/image")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const guard = await requireAuthAndRateLimit(request);
+        if (!guard.ok) return guard.response;
+
         const { prompt, referenceUrl } = (await request.json()) as {
           prompt: string;
           referenceUrl?: string;
