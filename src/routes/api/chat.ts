@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { gatewayFetch } from "@/lib/ai-gateway.server";
+import { requireAuthAndRateLimit } from "@/lib/api-guard.server";
 
 type Attachment = { url: string; mimeType: string; name: string };
 type InMsg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
