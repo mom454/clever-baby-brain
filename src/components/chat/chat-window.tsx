@@ -105,7 +105,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
 
       if (content.startsWith("/image ")) {
         const prompt = content.slice(7).trim();
-        const r = await fetch("/api/image", {
+        const r = await (await import("@/lib/authed-fetch")).authedFetch("/api/image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, referenceUrl: atts[0]?.url }),
@@ -131,7 +131,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
       const { provider, model } = parseModelId(s.selectedModelId);
       const providerConfig = { provider, model, apiKey: s.keys[provider] };
 
-      const r = await fetch("/api/chat", {
+      const r = await (await import("@/lib/authed-fetch")).authedFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -206,7 +206,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
         const ext = rec.mimeType.includes("mp4") ? "mp4" : "webm";
         const fd = new FormData();
         fd.append("file", blob, `recording.${ext}`);
-        const resp = await fetch("/api/stt", { method: "POST", body: fd });
+        const resp = await (await import("@/lib/authed-fetch")).authedFetch("/api/stt", { method: "POST", body: fd });
         setRecording(false);
         if (!resp.ok) {
           toast.error(await resp.text());
@@ -225,7 +225,7 @@ export function ChatWindow({ threadId }: { threadId: string }) {
   }
 
   async function speak(text: string) {
-    const r = await fetch("/api/tts", {
+    const r = await (await import("@/lib/authed-fetch")).authedFetch("/api/tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, voice: s.voice }),
