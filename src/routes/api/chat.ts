@@ -255,6 +255,8 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const guard = await requireAuthAndRateLimit(request);
+        if (!guard.ok) return guard.response;
         const body = (await request.json()) as {
           messages: InMsg[];
           memories?: string[];
