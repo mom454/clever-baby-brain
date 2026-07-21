@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as MemoriesRouteImport } from './routes/memories'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatThreadIdRouteImport } from './routes/chat.$threadId'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
+import { Route as ApiMcpRouteImport } from './routes/api/mcp'
 import { Route as ApiImageRouteImport } from './routes/api/image'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
@@ -33,6 +35,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const MemoriesRoute = MemoriesRouteImport.update({
   id: '/memories',
   path: '/memories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -60,6 +67,11 @@ const ApiSttRoute = ApiSttRouteImport.update({
   path: '/api/stt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMcpRoute = ApiMcpRouteImport.update({
+  id: '/api/mcp',
+  path: '/api/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiImageRoute = ApiImageRouteImport.update({
   id: '/api/image',
   path: '/api/image',
@@ -73,11 +85,13 @@ const ApiChatRoute = ApiChatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/integrations': typeof IntegrationsRoute
   '/memories': typeof MemoriesRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/api/chat': typeof ApiChatRoute
   '/api/image': typeof ApiImageRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
@@ -85,11 +99,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/integrations': typeof IntegrationsRoute
   '/memories': typeof MemoriesRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/api/chat': typeof ApiChatRoute
   '/api/image': typeof ApiImageRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
@@ -98,11 +114,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/integrations': typeof IntegrationsRoute
   '/memories': typeof MemoriesRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/api/chat': typeof ApiChatRoute
   '/api/image': typeof ApiImageRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
@@ -112,11 +130,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/integrations'
     | '/memories'
     | '/settings'
     | '/voice'
     | '/api/chat'
     | '/api/image'
+    | '/api/mcp'
     | '/api/stt'
     | '/api/tts'
     | '/chat/$threadId'
@@ -124,11 +144,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/integrations'
     | '/memories'
     | '/settings'
     | '/voice'
     | '/api/chat'
     | '/api/image'
+    | '/api/mcp'
     | '/api/stt'
     | '/api/tts'
     | '/chat/$threadId'
@@ -136,11 +158,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/integrations'
     | '/memories'
     | '/settings'
     | '/voice'
     | '/api/chat'
     | '/api/image'
+    | '/api/mcp'
     | '/api/stt'
     | '/api/tts'
     | '/chat/$threadId'
@@ -149,11 +173,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   MemoriesRoute: typeof MemoriesRoute
   SettingsRoute: typeof SettingsRoute
   VoiceRoute: typeof VoiceRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiImageRoute: typeof ApiImageRoute
+  ApiMcpRoute: typeof ApiMcpRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
   ChatThreadIdRoute: typeof ChatThreadIdRoute
@@ -181,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/memories'
       fullPath: '/memories'
       preLoaderRoute: typeof MemoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -218,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSttRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mcp': {
+      id: '/api/mcp'
+      path: '/api/mcp'
+      fullPath: '/api/mcp'
+      preLoaderRoute: typeof ApiMcpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/image': {
       id: '/api/image'
       path: '/api/image'
@@ -237,11 +277,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  IntegrationsRoute: IntegrationsRoute,
   MemoriesRoute: MemoriesRoute,
   SettingsRoute: SettingsRoute,
   VoiceRoute: VoiceRoute,
   ApiChatRoute: ApiChatRoute,
   ApiImageRoute: ApiImageRoute,
+  ApiMcpRoute: ApiMcpRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,
   ChatThreadIdRoute: ChatThreadIdRoute,
@@ -250,13 +292,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
