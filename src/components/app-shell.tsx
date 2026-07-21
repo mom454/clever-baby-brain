@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Plus, MessageSquare, BrainCircuit, Trash2, Sparkles, Sun, Moon, Menu, Settings as SettingsIcon, Mic, Command as CommandIcon } from "lucide-react";
+import { Plus, MessageSquare, BrainCircuit, Trash2, Sparkles, Sun, Moon, Menu, Settings as SettingsIcon, Mic, Command as CommandIcon, Plug } from "lucide-react";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
@@ -142,6 +142,13 @@ function Sidebar({
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
           >
             <BrainCircuit size={16} className="opacity-70" /> Memories
+          </Link>
+          <Link
+            to="/integrations"
+            onClick={onCloseMobile}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"
+          >
+            <Plug size={16} className="opacity-70" /> Integrations
           </Link>
           <Link
             to="/settings"
